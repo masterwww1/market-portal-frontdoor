@@ -1,0 +1,9 @@
+/* B2Bmarket portal – app styles */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'DM Sans', sans-serif;
+}
