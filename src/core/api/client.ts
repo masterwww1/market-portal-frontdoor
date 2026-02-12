@@ -6,8 +6,7 @@ import axios from 'axios';
  * Priority:
  * 1. VITE_API_BASE_URL (explicit override)
  * 2. VITE_BACKEND_URL + /api (if VITE_USE_PROXY=false)
- * 3. Auto-generated from backend config components (if VITE_USE_PROXY=false)
- * 4. Relative path '/api' (uses Vite proxy)
+ * 3. Relative path '/api' (uses Vite proxy)
  */
 function getApiBaseUrl(): string {
   // Explicit override
@@ -19,18 +18,10 @@ function getApiBaseUrl(): string {
   const useProxy = import.meta.env.VITE_USE_PROXY !== 'false';
   
   if (!useProxy) {
-    // Use VITE_BACKEND_URL if available
-    if (import.meta.env.VITE_BACKEND_URL) {
-      const backendUrl = import.meta.env.VITE_BACKEND_URL;
-      // Ensure it ends with /api
-      return backendUrl.endsWith('/api') ? backendUrl : `${backendUrl}/api`;
-    }
-    
-    // Build URL from backend configuration components
-    const protocol = import.meta.env.VITE_BACKEND_PROTOCOL || 'http';
-    const host = import.meta.env.VITE_BACKEND_HOST || 'localhost';
-    const port = import.meta.env.VITE_BACKEND_PORT || '8210';
-    return `${protocol}://${host}:${port}/api`;
+    // Use VITE_BACKEND_URL
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://127.0.0.1:8210';
+    // Ensure it ends with /api
+    return backendUrl.endsWith('/api') ? backendUrl : `${backendUrl}/api`;
   }
 
   // Default: use relative path with proxy

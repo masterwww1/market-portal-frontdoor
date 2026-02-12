@@ -10,19 +10,12 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, path.resolve(__dirname), '');
 
   // Get backend configuration from environment variables
-  // Priority: VITE_BACKEND_URL > individual components
-  let backendUrl: string;
-  if (env.VITE_BACKEND_URL) {
-    backendUrl = env.VITE_BACKEND_URL;
-  } else {
-    const backendHost = env.VITE_BACKEND_HOST || 'localhost';
-    const backendPort = env.VITE_BACKEND_PORT || '8210';
-    const backendProtocol = env.VITE_BACKEND_PROTOCOL || 'http';
-    backendUrl = `${backendProtocol}://127.0.0.1:${backendPort}`;
-  }
-  
+  const backendUrl = env.VITE_BACKEND_URL || 'http://127.0.0.1:8210';
   const frontendPort = parseInt(env.VITE_FRONTEND_PORT || '3000', 10);
   const useProxy = env.VITE_USE_PROXY !== 'false';
+  
+  // Normalize localhost to 127.0.0.1 to force IPv4 and avoid IPv6 issues
+  const normalizedBackendUrl = backendUrl.replace(/localhost/g, '127.0.0.1');
 
   return {
     plugins: [react()],
@@ -35,7 +28,7 @@ export default defineConfig(({ mode }) => {
       proxy: useProxy
         ? {
             '/api': {
-              target: backendUrl,
+              target: normalizedBackendUrl,
               changeOrigin: true,
               secure: false,
               rewrite: (path) => path, // Keep /api prefix
