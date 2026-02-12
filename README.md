@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="src/asset/logo.png" alt="B2Bmarket Logo" width="200" />
+</div>
+
 # B2Bmarket Portal – Frontend
 
 React + TypeScript frontend for the B2B marketplace portal (Vite).
