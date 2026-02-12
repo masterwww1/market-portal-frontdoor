@@ -11,6 +11,7 @@ import {
   Link,
 } from '@mui/material';
 import { useAuth } from '@/core/contexts/AuthContext';
+import logo from '@/asset/logo.png';
 
 export function LoginPage() {
   const [email, setEmail] = useState('');
@@ -52,9 +53,21 @@ export function LoginPage() {
         }}
       >
         <Paper elevation={3} sx={{ p: 4, width: '100%' }}>
-          <Typography component="h1" variant="h5" align="center" gutterBottom>
-            B2Bmarket
-          </Typography>
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 2 }}>
+            <Box
+              component="img"
+              src={logo}
+              alt="B2Bmarket Logo"
+              sx={{
+                height: 80,
+                width: 'auto',
+                mb: 2,
+              }}
+            />
+            <Typography component="h1" variant="h5" align="center" gutterBottom>
+              B2Bmarket
+            </Typography>
+          </Box>
           <Typography component="h2" variant="h6" align="center" color="text.secondary" sx={{ mb: 3 }}>
             Sign in to your account
           </Typography>

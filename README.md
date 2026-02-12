@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="src/asset/logo.png" alt="B2Bmarket Logo" width="200" />
+</div>
+
 # B2Bmarket Portal – Frontend
 
 React + TypeScript frontend for the B2B marketplace portal (Vite).
@@ -6,7 +10,30 @@ React + TypeScript frontend for the B2B marketplace portal (Vite).
 
 ```bash
 npm install
+cp .env.sample .env
+# Edit .env to configure backend URL and port
 ```
+
+## Configuration
+
+The frontend reads configuration from `.env` file. Key variables:
+
+**Backend Configuration (choose one approach):**
+
+**Option 1: Full URL (recommended)**
+- `VITE_BACKEND_URL` - Complete backend URL (e.g., `http://localhost:8210`)
+
+**Option 2: Individual components**
+- `VITE_BACKEND_HOST` - Backend host (default: localhost)
+- `VITE_BACKEND_PORT` - Backend port (default: 8210)
+- `VITE_BACKEND_PROTOCOL` - Backend protocol (http/https, default: http)
+
+**Other Configuration:**
+- `VITE_USE_PROXY` - Use Vite proxy for API requests (true/false, default: true)
+- `VITE_FRONTEND_PORT` - Frontend dev server port (default: 3000)
+- `VITE_API_BASE_URL` - Override API base URL (optional, auto-generated if not set)
+
+**Priority:** `VITE_BACKEND_URL` takes precedence over individual components.
 
 ## Run
 
@@ -14,8 +41,8 @@ npm install
 npm run dev
 ```
 
-- App: http://localhost:3000  
-- Ensure the B2Bmarket backend is running on port 8000 so `/api` proxy works.
+- App: http://localhost:{VITE_FRONTEND_PORT} (default: 3000)
+- Ensure the B2Bmarket backend is running on the configured port (default: 8210)
 
 ## Build
 
