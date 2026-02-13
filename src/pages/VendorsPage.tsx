@@ -1,18 +1,6 @@
 import { useEffect, useState } from 'react';
-import {
-  Box,
-  Button,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TextField,
-  Typography,
-} from '@mui/material';
 import { getVendors, createVendor, VendorResponse } from '@/core/api/vendors';
+import { DataTable, Column } from '@/components/DataTable';
 
 export function VendorsPage() {
   const [vendors, setVendors] = useState<VendorResponse[]>([]);
@@ -47,66 +35,101 @@ export function VendorsPage() {
       .finally(() => setSubmitting(false));
   };
 
+  const columns: Column<VendorResponse>[] = [
+    {
+      key: 'id',
+      header: 'ID',
+      className: 'w-20',
+    },
+    {
+      key: 'first_name',
+      header: 'First Name',
+      render: (vendor) => vendor.first_name || <span className="text-gray-400">—</span>,
+    },
+    {
+      key: 'last_name',
+      header: 'Last Name',
+      render: (vendor) => vendor.last_name || <span className="text-gray-400">—</span>,
+    },
+    {
+      key: 'email',
+      header: 'Email',
+      render: (vendor) =>
+        vendor.email ? (
+          <a href={`mailto:${vendor.email}`} className="text-blue-600 hover:text-blue-800 hover:underline">
+            {vendor.email}
+          </a>
+        ) : (
+          <span className="text-gray-400">—</span>
+        ),
+    },
+    {
+      key: 'phone_number',
+      header: 'Phone Number',
+      render: (vendor) =>
+        vendor.phone_number ? (
+          <a href={`tel:${vendor.phone_number}`} className="text-blue-600 hover:text-blue-800 hover:underline">
+            {vendor.phone_number}
+          </a>
+        ) : (
+          <span className="text-gray-400">—</span>
+        ),
+    },
+    {
+      key: 'name',
+      header: 'Company Name',
+    },
+    {
+      key: 'created_at',
+      header: 'Created',
+      render: (vendor) => new Date(vendor.created_at).toLocaleString(),
+      className: 'w-48',
+    },
+  ];
+
   if (error) {
     return (
-      <Box>
-        <Typography variant="h5" gutterBottom>
-          Vendors
-        </Typography>
-        <Typography color="error">{error}</Typography>
-      </Box>
+      <div className="p-6">
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">Vendors</h1>
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+          {error}
+        </div>
+      </div>
     );
   }
 
   return (
-    <Box>
-      <Typography variant="h5" gutterBottom>
-        Vendors
-      </Typography>
-      <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', mb: 2 }}>
-        <TextField
-          size="small"
-          label="Vendor name"
+    <div className="w-full p-6">
+      <h1 className="text-3xl font-bold text-gray-900 mb-6">Vendors</h1>
+      
+      {/* Add Vendor Form */}
+      <div className="mb-6 flex gap-3 items-center">
+        <input
+          type="text"
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
-          placeholder="Add a vendor"
-          sx={{ minWidth: 220 }}
+          placeholder="Vendor name"
+          className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent min-w-[220px]"
+          disabled={submitting}
         />
-        <Button variant="contained" onClick={handleCreate} disabled={submitting || !newName.trim()}>
-          Add
-        </Button>
-      </Box>
-      <TableContainer component={Paper} sx={{ maxWidth: 600 }}>
-        <Table size="small">
-          <TableHead>
-            <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell>Name</TableCell>
-              <TableCell>Created</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {loading ? (
-              <TableRow>
-                <TableCell colSpan={3}>Loading…</TableCell>
-              </TableRow>
-            ) : vendors.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={3}>No vendors yet. Add one above.</TableCell>
-              </TableRow>
-            ) : (
-              vendors.map((v) => (
-                <TableRow key={v.id}>
-                  <TableCell>{v.id}</TableCell>
-                  <TableCell>{v.name}</TableCell>
-                  <TableCell>{new Date(v.created_at).toLocaleString()}</TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </Box>
+        <button
+          onClick={handleCreate}
+          disabled={submitting || !newName.trim()}
+          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150 font-medium"
+        >
+          {submitting ? 'Adding...' : 'ADD'}
+        </button>
+      </div>
+
+      {/* Data Table */}
+      <DataTable
+        data={vendors}
+        columns={columns}
+        loading={loading}
+        emptyMessage="No vendors yet. Add one above."
+        className="w-full"
+      />
+    </div>
   );
 }
