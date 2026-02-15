@@ -4,6 +4,7 @@ import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { HomePage } from '@/pages/HomePage';
 import { HealthPage } from '@/pages/HealthPage';
 import { VendorsPage } from '@/pages/VendorsPage';
+import { ProductsPage } from '@/pages/ProductsPage';
 import { LoginPage } from '@/pages/LoginPage';
 import '@/app/style.css';
 
@@ -25,6 +26,14 @@ function App() {
           element={
             <ProtectedRoute>
               <VendorsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/products"
+          element={
+            <ProtectedRoute>
+              <ProductsPage />
             </ProtectedRoute>
           }
         />
