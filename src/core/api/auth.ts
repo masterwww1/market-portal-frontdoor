@@ -21,6 +21,7 @@ export interface LoginResponse {
   user: {
     id: number;
     email: string;
+    vendor_id?: number;
   };
 }
 
@@ -35,6 +36,7 @@ export interface VerifyTokenResponse {
   user: {
     id: number;
     email: string;
+    vendor_id?: number;
   };
   payload: {
     sub: string;

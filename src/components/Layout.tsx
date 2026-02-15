@@ -35,6 +35,9 @@ export function Layout({ children }: LayoutProps) {
               <Link component={RouterLink} to="/vendors" color="inherit" sx={{ mx: 1 }}>
                 Vendors
               </Link>
+              <Link component={RouterLink} to="/products" color="inherit" sx={{ mx: 1 }}>
+                Products
+              </Link>
               <Link component={RouterLink} to="/health" color="inherit" sx={{ mx: 1 }}>
                 Health
               </Link>

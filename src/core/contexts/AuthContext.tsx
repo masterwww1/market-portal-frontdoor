@@ -5,6 +5,7 @@ import { login as loginApi, refreshToken as refreshTokenApi, verifyToken as veri
 interface User {
   id: number;
   email: string;
+  vendor_id?: number;
 }
 
 interface AuthContextType {
@@ -36,9 +37,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         const parsedUser = JSON.parse(storedUser);
         setUser(parsedUser);
-        // Verify token is still valid
+        // Verify token is still valid and sync user (e.g. vendor_id) from server
         verifyTokenApi(accessToken)
-          .then(() => {
+          .then((res) => {
+            if (res.valid && res.user?.id) {
+              const updatedUser = { id: res.user.id, email: res.user.email, vendor_id: res.user.vendor_id };
+              setUser(updatedUser);
+              localStorage.setItem(USER_KEY, JSON.stringify(updatedUser));
+            }
             setLoading(false);
           })
           .catch(() => {
