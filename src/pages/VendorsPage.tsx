@@ -1,13 +1,31 @@
 import { useEffect, useState } from 'react';
 import { getVendors, createVendor, VendorResponse } from '@/core/api/vendors';
 import { DataTable, Column } from '@/components/DataTable';
+import { Modal } from '@/components/Modal';
+
+type AddVendorForm = {
+  companyName: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone_number: string;
+};
+
+const initialForm: AddVendorForm = {
+  companyName: '',
+  first_name: '',
+  last_name: '',
+  email: '',
+  phone_number: '',
+};
 
 export function VendorsPage() {
   const [vendors, setVendors] = useState<VendorResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [newName, setNewName] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [form, setForm] = useState(initialForm);
 
   const loadVendors = () => {
     setLoading(true);
@@ -22,13 +40,40 @@ export function VendorsPage() {
     loadVendors();
   }, []);
 
-  const handleCreate = () => {
-    const name = newName.trim();
-    if (!name) return;
+  const openModal = () => {
+    setForm(initialForm);
+    setModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalOpen(false);
+    setForm(initialForm);
+  };
+
+  const handleChange = (field: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm((prev) => ({ ...prev, [field]: e.target.value }));
+  };
+
+  const allFieldsFilled =
+    form.companyName.trim() !== '' &&
+    form.first_name.trim() !== '' &&
+    form.last_name.trim() !== '' &&
+    form.email.trim() !== '' &&
+    form.phone_number.trim() !== '';
+
+  const handleCreate = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!allFieldsFilled) return;
     setSubmitting(true);
-    createVendor({ name })
+    createVendor({
+      name: form.companyName.trim(),
+      first_name: form.first_name.trim(),
+      last_name: form.last_name.trim(),
+      email: form.email.trim(),
+      phone_number: form.phone_number.trim(),
+    })
       .then(() => {
-        setNewName('');
+        closeModal();
         loadVendors();
       })
       .catch((err) => setError(err.message || 'Failed to create vendor'))
@@ -100,36 +145,117 @@ export function VendorsPage() {
 
   return (
     <div className="w-full p-6">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">Vendors</h1>
-      
-      {/* Add Vendor Form */}
-      <div className="mb-6 flex gap-3 items-center">
-        <input
-          type="text"
-          value={newName}
-          onChange={(e) => setNewName(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
-          placeholder="Vendor name"
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent min-w-[220px]"
-          disabled={submitting}
-        />
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-3xl font-bold text-gray-900">Vendors</h1>
         <button
-          onClick={handleCreate}
-          disabled={submitting || !newName.trim()}
-          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150 font-medium"
+          type="button"
+          onClick={openModal}
+          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-150 font-medium"
         >
-          {submitting ? 'Adding...' : 'ADD'}
+          Add Vendor
         </button>
       </div>
 
-      {/* Data Table */}
       <DataTable
         data={vendors}
         columns={columns}
         loading={loading}
-        emptyMessage="No vendors yet. Add one above."
+        emptyMessage="No vendors yet. Click Add Vendor to create one."
         className="w-full"
       />
+
+      <Modal isOpen={modalOpen} onClose={closeModal} title="Add Vendor">
+        <form onSubmit={handleCreate} className="space-y-4">
+          <div>
+            <label htmlFor="companyName" className="block text-sm font-medium text-gray-700 mb-1">
+              Company Name <span className="text-red-500">*</span>
+            </label>
+            <input
+              id="companyName"
+              type="text"
+              value={form.companyName}
+              onChange={handleChange('companyName')}
+              placeholder="Company name"
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
+                First Name <span className="text-red-500">*</span>
+              </label>
+              <input
+                id="firstName"
+                type="text"
+                value={form.first_name}
+                onChange={handleChange('first_name')}
+                placeholder="First name"
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            <div>
+              <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
+                Last Name <span className="text-red-500">*</span>
+              </label>
+              <input
+                id="lastName"
+                type="text"
+                value={form.last_name}
+                onChange={handleChange('last_name')}
+                placeholder="Last name"
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+          </div>
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+              Email <span className="text-red-500">*</span>
+            </label>
+            <input
+              id="email"
+              type="email"
+              value={form.email}
+              onChange={handleChange('email')}
+              placeholder="email@example.com"
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+          <div>
+            <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
+              Phone Number <span className="text-red-500">*</span>
+            </label>
+            <input
+              id="phone"
+              type="tel"
+              value={form.phone_number}
+              onChange={handleChange('phone_number')}
+              placeholder="+1 234 567 8900"
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+          <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
+            <button
+              type="button"
+              onClick={closeModal}
+              className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={submitting || !allFieldsFilled}
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+            >
+              {submitting ? 'Adding...' : 'Add Vendor'}
+            </button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 }
