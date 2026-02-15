@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* B2Bmarket portal – app styles */
 * {
   box-sizing: border-box;
