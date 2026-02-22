@@ -1,25 +1,33 @@
 import { ReactNode } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useLocation } from 'react-router-dom';
 import {
   AppBar,
   Toolbar,
   Typography,
-  Link,
-  Container,
   Button,
   Box,
 } from '@mui/material';
 import { useAuth } from '@/core/contexts/AuthContext';
 
+const SIDEBAR_WIDTH = 220;
+
 interface LayoutProps {
   children: ReactNode;
 }
 
+const navItems = [
+  { to: '/', label: 'Home' },
+  { to: '/vendors', label: 'Vendors' },
+  { to: '/products', label: 'Products' },
+  { to: '/health', label: 'Health' },
+];
+
 export function Layout({ children }: LayoutProps) {
   const { user, logout, isAuthenticated } = useAuth();
+  const location = useLocation();
 
   return (
-    <>
+    <div className="flex flex-col h-screen w-full">
       <AppBar position="static" color="primary" elevation={0}>
         <Toolbar>
           <Typography
@@ -31,23 +39,12 @@ export function Layout({ children }: LayoutProps) {
             B2Bmarket
           </Typography>
           {isAuthenticated ? (
-            <>
-              <Link component={RouterLink} to="/vendors" color="inherit" sx={{ mx: 1 }}>
-                Vendors
-              </Link>
-              <Link component={RouterLink} to="/products" color="inherit" sx={{ mx: 1 }}>
-                Products
-              </Link>
-              <Link component={RouterLink} to="/health" color="inherit" sx={{ mx: 1 }}>
-                Health
-              </Link>
-              <Box sx={{ ml: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
-                <Typography variant="body2">{user?.email}</Typography>
-                <Button color="inherit" onClick={logout} size="small">
-                  Logout
-                </Button>
-              </Box>
-            </>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Typography variant="body2">{user?.email}</Typography>
+              <Button color="inherit" onClick={logout} size="small">
+                Logout
+              </Button>
+            </Box>
           ) : (
             <Button color="inherit" component={RouterLink} to="/login">
               Login
@@ -55,9 +52,38 @@ export function Layout({ children }: LayoutProps) {
           )}
         </Toolbar>
       </AppBar>
-      <Container component="main" sx={{ py: 3 }}>
-        {children}
-      </Container>
-    </>
+
+      <div className="flex flex-1 min-h-0 w-full">
+        {isAuthenticated && (
+          <aside
+            className="flex-shrink-0 border-r border-gray-200 bg-gray-50 flex flex-col"
+            style={{ width: SIDEBAR_WIDTH }}
+          >
+            <nav className="p-4 flex flex-col gap-1">
+              {navItems.map(({ to, label }) => {
+                const isActive = location.pathname === to || (to !== '/' && location.pathname.startsWith(to));
+                return (
+                  <RouterLink
+                    key={to}
+                    to={to}
+                    className={`px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+                      isActive
+                        ? 'bg-blue-100 text-blue-800'
+                        : 'text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    {label}
+                  </RouterLink>
+                );
+              })}
+            </nav>
+          </aside>
+        )}
+
+        <main className="flex-1 min-w-0 overflow-auto">
+          {children}
+        </main>
+      </div>
+    </div>
   );
 }
