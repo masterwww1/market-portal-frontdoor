@@ -143,26 +143,115 @@ export function VendorsPage() {
     );
   }
 
+  const recentVendors = [...vendors].slice(0, 5);
+
   return (
-    <div className="w-full p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Vendors</h1>
-        <button
-          type="button"
-          onClick={openModal}
-          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-150 font-medium"
-        >
-          Add Vendor
-        </button>
+    <div className="flex w-full h-full min-h-0">
+      {/* Center: table */}
+      <div className="flex-1 min-w-0 flex flex-col p-6 overflow-auto">
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-3xl font-bold text-gray-900">Vendors</h1>
+          <button
+            type="button"
+            onClick={openModal}
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-150 font-medium"
+          >
+            Add Vendor
+          </button>
+        </div>
+
+        <DataTable
+          data={vendors}
+          columns={columns}
+          loading={loading}
+          emptyMessage="No vendors yet. Click Add Vendor to create one."
+          className="w-full"
+        />
       </div>
 
-      <DataTable
-        data={vendors}
-        columns={columns}
-        loading={loading}
-        emptyMessage="No vendors yet. Click Add Vendor to create one."
-        className="w-full"
-      />
+      {/* Right: card with charts and details */}
+      <div
+        className="flex-shrink-0 border-l border-gray-200 bg-gray-50 overflow-auto"
+        style={{ width: 320 }}
+      >
+        <div className="p-6 space-y-6">
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900 mb-3">Overview</h2>
+            <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+              <p className="text-sm text-gray-500">Total vendors</p>
+              <p className="text-2xl font-bold text-gray-900">{loading ? '—' : vendors.length}</p>
+            </div>
+          </div>
+
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900 mb-3">Vendors (recent)</h2>
+            <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+              <div className="space-y-2">
+                {recentVendors.length === 0 && !loading && (
+                  <p className="text-sm text-gray-500">No vendors yet</p>
+                )}
+                {recentVendors.length === 0 && loading && (
+                  <p className="text-sm text-gray-500">Loading...</p>
+                )}
+                {recentVendors.map((v) => (
+                  <div key={v.id} className="flex items-center gap-2">
+                    <div
+                      className="flex-shrink-0 rounded bg-blue-100"
+                      style={{
+                        width: 8,
+                        height: 32,
+                        maxHeight: 48,
+                        minHeight: 8,
+                      }}
+                    />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium text-gray-900 truncate">{v.name}</p>
+                      <p className="text-xs text-gray-500 truncate">{v.email || '—'}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900 mb-3">Trend</h2>
+            <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+              <div className="flex items-end gap-2 h-32">
+                {[6, 4, 8, 5, 7, 9, vendors.length || 1].map((val, i) => (
+                  <div
+                    key={i}
+                    className="flex-1 min-w-0 flex flex-col justify-end"
+                    title={`${val}`}
+                  >
+                    <div
+                      className="rounded-t bg-blue-500 w-full"
+                      style={{
+                        height: `${Math.max(8, (val / 10) * 100)}%`,
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-gray-500 mt-2 text-center">Last 7 entries (sample)</p>
+            </div>
+          </div>
+
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900 mb-3">Details</h2>
+            <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-gray-500">Page</span>
+                <span className="font-medium">Vendors</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500">Loaded</span>
+                <span className="font-medium">{loading ? '…' : vendors.length} rows</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <Modal isOpen={modalOpen} onClose={closeModal} title="Add Vendor">
         <form onSubmit={handleCreate} className="space-y-4">
