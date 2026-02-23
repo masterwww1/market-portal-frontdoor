@@ -3,6 +3,9 @@ import { getProducts, createProduct, ProductResponse } from '@/core/api/products
 import { DataTable, Column } from '@/components/DataTable';
 import { Modal } from '@/components/Modal';
 import { useAuth } from '@/core/contexts/AuthContext';
+import { addProductSchema } from '@/core/validation/schemas';
+import { validateForm } from '@/core/validation/validate';
+import type { FieldErrors } from '@/core/validation/validate';
 
 type AddProductForm = {
   name: string;
@@ -26,6 +29,7 @@ export function ProductsPage() {
   const [submitting, setSubmitting] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [form, setForm] = useState(initialForm);
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
 
   const isVendor = user?.vendor_id != null;
 
@@ -44,12 +48,14 @@ export function ProductsPage() {
 
   const openModal = () => {
     setForm(initialForm);
+    setFieldErrors({});
     setModalOpen(true);
   };
 
   const closeModal = () => {
     setModalOpen(false);
     setForm(initialForm);
+    setFieldErrors({});
   };
 
   const handleChange = (field: keyof typeof form) => (
@@ -58,19 +64,27 @@ export function ProductsPage() {
     setForm((prev) => ({ ...prev, [field]: e.target.value }));
   };
 
-  const priceNum = parseFloat(form.price);
-  const allRequiredFilled =
-    form.name.trim() !== '' && !Number.isNaN(priceNum) && priceNum >= 0;
-
   const handleCreate = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!allRequiredFilled) return;
+    const priceNum = form.price === '' ? undefined : parseFloat(form.price);
+    const payload = {
+      name: form.name,
+      sku: form.sku,
+      description: form.description,
+      price: priceNum as number,
+    };
+    const result = validateForm(addProductSchema, payload);
+    if (result.fieldErrors) {
+      setFieldErrors(result.fieldErrors);
+      return;
+    }
+    setFieldErrors({});
     setSubmitting(true);
     createProduct({
-      name: form.name.trim(),
-      sku: form.sku.trim() || undefined,
-      description: form.description.trim() || undefined,
-      price: priceNum,
+      name: result.value!.name.trim(),
+      sku: result.value!.sku?.trim() || undefined,
+      description: result.value!.description?.trim() || undefined,
+      price: result.value!.price,
     })
       .then(() => {
         closeModal();
@@ -168,9 +182,11 @@ export function ProductsPage() {
               value={form.name}
               onChange={handleChange('name')}
               placeholder="Product name"
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${fieldErrors.name ? 'border-red-500' : 'border-gray-300'}`}
             />
+            {fieldErrors.name && (
+              <p className="mt-1 text-sm text-red-600">{fieldErrors.name}</p>
+            )}
           </div>
           <div>
             <label htmlFor="productPrice" className="block text-sm font-medium text-gray-700 mb-1">
@@ -184,9 +200,11 @@ export function ProductsPage() {
               value={form.price}
               onChange={handleChange('price')}
               placeholder="0.00"
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${fieldErrors.price ? 'border-red-500' : 'border-gray-300'}`}
             />
+            {fieldErrors.price && (
+              <p className="mt-1 text-sm text-red-600">{fieldErrors.price}</p>
+            )}
           </div>
           <div>
             <label htmlFor="productSku" className="block text-sm font-medium text-gray-700 mb-1">
@@ -198,8 +216,11 @@ export function ProductsPage() {
               value={form.sku}
               onChange={handleChange('sku')}
               placeholder="Stock keeping unit"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${fieldErrors.sku ? 'border-red-500' : 'border-gray-300'}`}
             />
+            {fieldErrors.sku && (
+              <p className="mt-1 text-sm text-red-600">{fieldErrors.sku}</p>
+            )}
           </div>
           <div>
             <label htmlFor="productDescription" className="block text-sm font-medium text-gray-700 mb-1">
@@ -211,8 +232,11 @@ export function ProductsPage() {
               onChange={handleChange('description')}
               placeholder="Product description"
               rows={3}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${fieldErrors.description ? 'border-red-500' : 'border-gray-300'}`}
             />
+            {fieldErrors.description && (
+              <p className="mt-1 text-sm text-red-600">{fieldErrors.description}</p>
+            )}
           </div>
           <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
             <button
@@ -224,7 +248,7 @@ export function ProductsPage() {
             </button>
             <button
               type="submit"
-              disabled={submitting || !allRequiredFilled}
+              disabled={submitting}
               className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
             >
               {submitting ? 'Adding...' : 'Add Product'}

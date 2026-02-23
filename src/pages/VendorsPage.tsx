@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react';
 import { getVendors, createVendor, VendorResponse } from '@/core/api/vendors';
 import { DataTable, Column } from '@/components/DataTable';
 import { Modal } from '@/components/Modal';
+import { addVendorSchema } from '@/core/validation/schemas';
+import { validateForm } from '@/core/validation/validate';
+import type { FieldErrors } from '@/core/validation/validate';
 
 type AddVendorForm = {
   companyName: string;
@@ -26,6 +29,7 @@ export function VendorsPage() {
   const [submitting, setSubmitting] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [form, setForm] = useState(initialForm);
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
 
   const loadVendors = () => {
     setLoading(true);
@@ -42,35 +46,35 @@ export function VendorsPage() {
 
   const openModal = () => {
     setForm(initialForm);
+    setFieldErrors({});
     setModalOpen(true);
   };
 
   const closeModal = () => {
     setModalOpen(false);
     setForm(initialForm);
+    setFieldErrors({});
   };
 
   const handleChange = (field: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({ ...prev, [field]: e.target.value }));
   };
 
-  const allFieldsFilled =
-    form.companyName.trim() !== '' &&
-    form.first_name.trim() !== '' &&
-    form.last_name.trim() !== '' &&
-    form.email.trim() !== '' &&
-    form.phone_number.trim() !== '';
-
   const handleCreate = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!allFieldsFilled) return;
+    const result = validateForm(addVendorSchema, form);
+    if (result.fieldErrors) {
+      setFieldErrors(result.fieldErrors);
+      return;
+    }
+    setFieldErrors({});
     setSubmitting(true);
     createVendor({
-      name: form.companyName.trim(),
-      first_name: form.first_name.trim(),
-      last_name: form.last_name.trim(),
-      email: form.email.trim(),
-      phone_number: form.phone_number.trim(),
+      name: result.value.companyName,
+      first_name: result.value.first_name,
+      last_name: result.value.last_name,
+      email: result.value.email,
+      phone_number: result.value.phone_number,
     })
       .then(() => {
         closeModal();
@@ -265,9 +269,11 @@ export function VendorsPage() {
               value={form.companyName}
               onChange={handleChange('companyName')}
               placeholder="Company name"
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${fieldErrors.companyName ? 'border-red-500' : 'border-gray-300'}`}
             />
+            {fieldErrors.companyName && (
+              <p className="mt-1 text-sm text-red-600">{fieldErrors.companyName}</p>
+            )}
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -280,9 +286,11 @@ export function VendorsPage() {
                 value={form.first_name}
                 onChange={handleChange('first_name')}
                 placeholder="First name"
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${fieldErrors.first_name ? 'border-red-500' : 'border-gray-300'}`}
               />
+              {fieldErrors.first_name && (
+                <p className="mt-1 text-sm text-red-600">{fieldErrors.first_name}</p>
+              )}
             </div>
             <div>
               <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
@@ -294,9 +302,11 @@ export function VendorsPage() {
                 value={form.last_name}
                 onChange={handleChange('last_name')}
                 placeholder="Last name"
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${fieldErrors.last_name ? 'border-red-500' : 'border-gray-300'}`}
               />
+              {fieldErrors.last_name && (
+                <p className="mt-1 text-sm text-red-600">{fieldErrors.last_name}</p>
+              )}
             </div>
           </div>
           <div>
@@ -309,9 +319,11 @@ export function VendorsPage() {
               value={form.email}
               onChange={handleChange('email')}
               placeholder="email@example.com"
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${fieldErrors.email ? 'border-red-500' : 'border-gray-300'}`}
             />
+            {fieldErrors.email && (
+              <p className="mt-1 text-sm text-red-600">{fieldErrors.email}</p>
+            )}
           </div>
           <div>
             <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
@@ -323,9 +335,11 @@ export function VendorsPage() {
               value={form.phone_number}
               onChange={handleChange('phone_number')}
               placeholder="+1 234 567 8900"
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${fieldErrors.phone_number ? 'border-red-500' : 'border-gray-300'}`}
             />
+            {fieldErrors.phone_number && (
+              <p className="mt-1 text-sm text-red-600">{fieldErrors.phone_number}</p>
+            )}
           </div>
           <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
             <button
@@ -337,7 +351,7 @@ export function VendorsPage() {
             </button>
             <button
               type="submit"
-              disabled={submitting || !allFieldsFilled}
+              disabled={submitting}
               className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
             >
               {submitting ? 'Adding...' : 'Add Vendor'}
