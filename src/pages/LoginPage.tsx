@@ -23,7 +23,7 @@ export function LoginPage() {
 
   // Redirect if already authenticated
   if (isAuthenticated) {
-    navigate('/');
+    navigate('/dashboard');
     return null;
   }
 

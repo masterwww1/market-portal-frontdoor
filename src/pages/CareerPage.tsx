@@ -1,18 +1,13 @@
 import { useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
-import {
-  Box,
-  Typography,
-  Button,
-  Chip,
-  Collapse,
-  Divider,
-} from '@mui/material';
+import { Typography, Collapse } from '@mui/material';
 import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 
 interface Job {
   id: number;
@@ -119,109 +114,162 @@ const openRoles: Job[] = [
 
 const values = [
   {
-    icon: '🚀',
-    title: 'Move fast, stay precise',
-    body: 'We ship frequently but never cut corners on correctness. Speed and quality are not opposites.',
+    img: '/b2b-card-dev-discussion.png',
+    title: 'Precision at Every Step',
+    body: 'We move quickly without sacrificing quality. Our engineering culture is rooted in rigorous code review, continuous delivery, and a shared commitment to correctness. Every feature we ship is deliberate — because reliability is the foundation our customers build their businesses on.',
   },
   {
-    icon: '🤝',
-    title: 'Vendors & buyers first',
-    body: 'Every decision starts with the question: does this make trade better for the people using our platform?',
+    img: '/b2b-card-vendor-onboarding.png',
+    title: 'Partnerships That Last',
+    body: 'Every product decision begins with a single question: does this create real value for the vendors and buyers on our platform? We work hand-in-hand with our partners from day one, treating their growth as our own and building relationships that extend well beyond the initial onboarding.',
   },
   {
-    icon: '🌍',
-    title: 'Distributed by default',
-    body: 'Our team spans continents. We write clearly, communicate asynchronously, and trust each other.',
+    img: '/b2b-card-remote-team.png',
+    title: 'Global Team, One Mission',
+    body: 'Our team operates across time zones without losing cohesion. We communicate with clarity, document decisions thoroughly, and trust each other to deliver. Being distributed is not a limitation — it is how we access world-class talent and build a genuinely inclusive workplace.',
   },
   {
-    icon: '📈',
-    title: 'Grow together',
-    body: 'We invest in mentorship, learning budgets, and career tracks so everyone levels up alongside the company.',
+    img: '/b2b-card-grow-together.png',
+    title: 'Invest in Each Other',
+    body: 'Growth at B2Bmarket is never a solo endeavour. We pair senior engineers with emerging talent, fund continuous learning through personal development budgets, and maintain transparent career tracks so every team member knows exactly where they stand and where they are headed.',
   },
 ];
 
+const TEAM_META: Record<string, { color: string; bg: string; accent: string }> = {
+  Engineering: { color: '#4f46e5', bg: '#eef2ff', accent: '#6366f1' },
+  Product:     { color: '#0369a1', bg: '#e0f2fe', accent: '#0284c7' },
+  Sales:       { color: '#047857', bg: '#d1fae5', accent: '#10b981' },
+  Design:      { color: '#be185d', bg: '#fce7f3', accent: '#ec4899' },
+};
+
+function BulletList({ items }: { items: string[] }) {
+  return (
+    <ul className="space-y-2 mt-2">
+      {items.map((item) => (
+        <li key={item} className="flex items-start gap-2.5 text-sm text-gray-600 leading-relaxed">
+          <CheckCircleOutlineIcon sx={{ fontSize: 16, color: '#635bff', mt: '2px', flexShrink: 0 }} />
+          {item}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 function JobCard({ job }: { job: Job }) {
   const [open, setOpen] = useState(false);
+  const meta = TEAM_META[job.team] ?? { color: '#374151', bg: '#f3f4f6', accent: '#6b7280' };
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow overflow-hidden">
+    <div
+      className="bg-white rounded-2xl border overflow-hidden transition-all duration-200"
+      style={{
+        borderColor: open ? meta.accent + '55' : '#e5e7eb',
+        boxShadow: open
+          ? `0 8px 30px ${meta.accent}18`
+          : '0 1px 4px rgba(0,0,0,0.06)',
+      }}
+    >
+      {/* Clickable header row */}
       <button
-        className="w-full text-left p-6 flex items-start justify-between gap-4 group"
+        className="w-full text-left px-7 py-5 flex items-center gap-5 group"
         onClick={() => setOpen((v) => !v)}
       >
+        {/* Team color bar */}
+        <div
+          className="hidden sm:block w-1 self-stretch rounded-full flex-shrink-0"
+          style={{ backgroundColor: meta.accent }}
+        />
+
         <div className="flex-1 min-w-0">
-          <div className="flex flex-wrap items-center gap-2 mb-2">
-            <Chip
-              label={job.team}
-              size="small"
-              sx={{ bgcolor: '#e8f0fe', color: '#1a56db', fontWeight: 600, fontSize: 11 }}
-            />
+          {/* Top row: team badge + tags */}
+          <div className="flex flex-wrap items-center gap-2 mb-2.5">
+            <span
+              className="text-xs font-bold px-2.5 py-1 rounded-full uppercase tracking-wider"
+              style={{ backgroundColor: meta.bg, color: meta.color }}
+            >
+              {job.team}
+            </span>
             {job.tags.map((t) => (
-              <Chip key={t} label={t} size="small" variant="outlined" sx={{ fontSize: 11 }} />
+              <span
+                key={t}
+                className="text-xs font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-500"
+              >
+                {t}
+              </span>
             ))}
           </div>
-          <Typography variant="h6" fontWeight={700} className="text-gray-900 mb-1">
+
+          {/* Job title */}
+          <h3 className="text-lg font-bold text-gray-900 leading-snug mb-2">
             {job.title}
-          </Typography>
-          <div className="flex flex-wrap gap-4 text-sm text-gray-500">
-            <span className="flex items-center gap-1">
-              <LocationOnOutlinedIcon sx={{ fontSize: 16 }} />
+          </h3>
+
+          {/* Meta: location + type */}
+          <div className="flex flex-wrap gap-4 text-sm text-gray-400">
+            <span className="flex items-center gap-1.5">
+              <LocationOnOutlinedIcon sx={{ fontSize: 15 }} />
               {job.location}
             </span>
-            <span className="flex items-center gap-1">
-              <AccessTimeOutlinedIcon sx={{ fontSize: 16 }} />
+            <span className="flex items-center gap-1.5">
+              <AccessTimeOutlinedIcon sx={{ fontSize: 15 }} />
               {job.type}
             </span>
           </div>
         </div>
-        <span className="flex-shrink-0 mt-1 text-gray-400 group-hover:text-blue-600 transition-colors">
-          {open ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-        </span>
+
+        {/* Expand toggle */}
+        <div
+          className="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200"
+          style={{
+            backgroundColor: open ? meta.bg : '#f9fafb',
+            color: open ? meta.color : '#9ca3af',
+          }}
+        >
+          {open ? <ExpandLessIcon sx={{ fontSize: 20 }} /> : <ExpandMoreIcon sx={{ fontSize: 20 }} />}
+        </div>
       </button>
 
+      {/* Expanded content */}
       <Collapse in={open}>
-        <Divider />
-        <div className="p-6 pt-5 space-y-5">
-          <Typography variant="body2" color="text.secondary" className="leading-relaxed">
+        <div
+          className="px-7 pb-7"
+          style={{ borderTop: `1px solid ${meta.accent}22` }}
+        >
+          {/* Description */}
+          <p className="text-sm text-gray-500 leading-relaxed mt-5 mb-6 max-w-2xl">
             {job.description}
-          </Typography>
+          </p>
 
-          <div>
-            <Typography variant="subtitle2" fontWeight={700} gutterBottom>
-              What you'll do
-            </Typography>
-            <ul className="space-y-1">
-              {job.responsibilities.map((r) => (
-                <li key={r} className="flex gap-2 text-sm text-gray-600">
-                  <span className="mt-0.5 text-blue-500 flex-shrink-0">•</span>
-                  {r}
-                </li>
-              ))}
-            </ul>
+          <div className="grid sm:grid-cols-2 gap-6 mb-7">
+            {/* Responsibilities */}
+            <div>
+              <p className="text-xs font-bold text-gray-700 uppercase tracking-widest mb-1">
+                What you'll do
+              </p>
+              <BulletList items={job.responsibilities} />
+            </div>
+
+            {/* Requirements */}
+            <div>
+              <p className="text-xs font-bold text-gray-700 uppercase tracking-widest mb-1">
+                What we're looking for
+              </p>
+              <BulletList items={job.requirements} />
+            </div>
           </div>
 
-          <div>
-            <Typography variant="subtitle2" fontWeight={700} gutterBottom>
-              What we're looking for
-            </Typography>
-            <ul className="space-y-1">
-              {job.requirements.map((r) => (
-                <li key={r} className="flex gap-2 text-sm text-gray-600">
-                  <span className="mt-0.5 text-blue-500 flex-shrink-0">•</span>
-                  {r}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <Button
-            variant="contained"
-            component={RouterLink}
+          {/* CTA */}
+          <RouterLink
             to="/contact"
-            sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 700 }}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white no-underline transition-all hover:scale-105"
+            style={{
+              background: `linear-gradient(135deg, ${meta.accent} 0%, ${meta.color} 100%)`,
+              textDecoration: 'none',
+            }}
           >
             Apply for this role
-          </Button>
+            <ArrowForwardIcon sx={{ fontSize: 16 }} />
+          </RouterLink>
         </div>
       </Collapse>
     </div>
@@ -278,64 +326,108 @@ export function CareerPage() {
       </section>
 
       {/* Values */}
-      <section className="max-w-5xl mx-auto px-6 py-16">
-        <Typography variant="h5" fontWeight={700} className="text-gray-900 mb-2">
-          How we work
-        </Typography>
-        <Typography variant="body2" color="text.secondary" className="mb-8">
-          A few principles that guide our day-to-day.
-        </Typography>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {values.map((v) => (
-            <div
-              key={v.title}
-              className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm hover:shadow-md transition-shadow"
-            >
-              <div className="text-3xl mb-3">{v.icon}</div>
-              <Typography variant="subtitle1" fontWeight={700} gutterBottom>
-                {v.title}
-              </Typography>
-              <Typography variant="body2" color="text.secondary" className="leading-relaxed">
-                {v.body}
-              </Typography>
-            </div>
-          ))}
+      <section style={{ background: '#0a2540' }} className="w-full py-16 px-6">
+        <div className="max-w-5xl mx-auto">
+          <Typography variant="overline" sx={{ color: '#93c5fd', fontWeight: 700, letterSpacing: 2, display: 'block', mb: 1 }}>
+            Our principles
+          </Typography>
+          <Typography variant="h4" fontWeight={800} sx={{ color: '#fff', mb: 1 }}>
+            How we work
+          </Typography>
+          <Typography variant="body1" sx={{ color: '#94a3b8', mb: 6, maxWidth: 480 }}>
+            A few principles that guide everything we do, from code review to customer calls.
+          </Typography>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+            {values.map((v) => (
+              <div
+                key={v.title}
+                className="flex flex-col rounded-2xl overflow-hidden group"
+                style={{ background: '#112d4e', border: '1px solid rgba(255,255,255,0.07)' }}
+              >
+                {/* card image */}
+                <div className="w-full overflow-hidden" style={{ height: 220 }}>
+                  <img
+                    src={v.img}
+                    alt={v.title}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                </div>
+
+                {/* card body */}
+                <div className="flex flex-col flex-1 p-6">
+                  <Typography variant="h6" fontWeight={700} sx={{ color: '#f1f5f9', mb: 1.5 }}>
+                    {v.title}
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: '#94a3b8', lineHeight: 1.8 }}>
+                    {v.body}
+                  </Typography>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* Open Roles */}
-      <section className="max-w-5xl mx-auto px-6 pb-20">
-        <Typography variant="h5" fontWeight={700} className="text-gray-900 mb-2">
-          Open roles
-        </Typography>
-        <Typography variant="body2" color="text.secondary" className="mb-8">
-          We're actively hiring across all teams. Click a role to read more and apply.
-        </Typography>
-        <div className="space-y-4">
-          {openRoles.map((job) => (
-            <JobCard key={job.id} job={job} />
-          ))}
-        </div>
+      <section className="bg-[#f8faff] py-20">
+        <div className="max-w-5xl mx-auto px-6">
+          {/* Section header */}
+          <div className="mb-12">
+            <span className="inline-flex items-center gap-2 text-xs font-bold text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-full uppercase tracking-wider mb-4">
+              <WorkOutlineIcon sx={{ fontSize: 13 }} />
+              We're hiring
+            </span>
+            <h2 className="text-4xl font-black text-gray-900 leading-tight mb-3">
+              Open roles
+            </h2>
+            <p className="text-gray-500 text-lg max-w-xl">
+              We're actively hiring across all teams. Click any role to read more and apply.
+            </p>
+          </div>
 
-        <Box
-          className="mt-10 rounded-2xl p-8 text-center"
-          sx={{ bgcolor: '#f0f7ff', border: '1px solid #bfdbfe' }}
-        >
-          <Typography variant="h6" fontWeight={700} gutterBottom>
-            Don't see the right role?
-          </Typography>
-          <Typography variant="body2" color="text.secondary" className="mb-4">
-            We're always keen to meet talented people. Send us a note and tell us what you're great at.
-          </Typography>
-          <Button
-            variant="contained"
-            component={RouterLink}
-            to="/contact"
-            sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 700 }}
+          {/* Job cards */}
+          <div className="space-y-4 mb-12">
+            {openRoles.map((job) => (
+              <JobCard key={job.id} job={job} />
+            ))}
+          </div>
+
+          {/* Don't see the right role CTA */}
+          <div
+            className="rounded-2xl p-10 text-center relative overflow-hidden"
+            style={{ background: 'linear-gradient(135deg, #0a2540 0%, #1a3a5c 60%, #635bff 100%)' }}
           >
-            Get in touch
-          </Button>
-        </Box>
+            {/* Decorative orb */}
+            <div
+              className="absolute -top-10 -right-10 w-48 h-48 rounded-full pointer-events-none"
+              style={{ background: 'radial-gradient(circle, rgba(99,91,255,0.3) 0%, transparent 70%)' }}
+            />
+            <div className="relative z-10">
+              <p className="text-xs font-bold text-blue-300 uppercase tracking-widest mb-3">
+                Open application
+              </p>
+              <h3 className="text-2xl font-black text-white mb-2">
+                Don't see the right role?
+              </h3>
+              <p className="text-white/60 text-sm mb-6 max-w-sm mx-auto">
+                We're always keen to meet talented people. Send us a note and tell us what you're great at.
+              </p>
+              <RouterLink
+                to="/contact"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold text-white no-underline transition-all hover:scale-105"
+                style={{
+                  background: 'linear-gradient(135deg, #635bff 0%, #4f46e5 100%)',
+                  textDecoration: 'none',
+                  boxShadow: '0 8px 24px rgba(99,91,255,0.4)',
+                }}
+              >
+                Get in touch
+                <ArrowForwardIcon sx={{ fontSize: 16 }} />
+              </RouterLink>
+            </div>
+          </div>
+        </div>
       </section>
     </div>
   );
