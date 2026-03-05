@@ -232,11 +232,16 @@ export function CareerPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero */}
-      <section className="w-full relative">
+      <section className="w-full relative overflow-hidden">
         <img
           src="/b2bmarket-hero-bg.png"
           alt="B2Bmarket team workspace"
           className="w-full block"
+          style={{
+            clipPath: 'inset(15% 0 15% 0)',
+            marginTop: '-8.37%',
+            marginBottom: '-8.37%',
+          }}
         />
         {/* bottom-20% gradient fade + text */}
         <div
