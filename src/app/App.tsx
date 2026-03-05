@@ -10,6 +10,9 @@ import { ProductsPage } from '@/pages/ProductsPage';
 import { LoginPage } from '@/pages/LoginPage';
 import { CareerPage } from '@/pages/CareerPage';
 import { ContactPage } from '@/pages/ContactPage';
+import NewsPage from '@/pages/NewsPage';
+import AboutPage from '@/pages/AboutPage';
+import PartnersPage from '@/pages/PartnersPage';
 import { getSubdomain } from '@/utils/subdomain';
 import '@/app/style.css';
 
@@ -28,8 +31,11 @@ function App() {
       <Route path="/login" element={<LoginPage />} />
 
       {/* Public pages — landing page style (nav + footer, no sidebar) */}
-      <Route path="/careers" element={<PublicLayout><CareerPage /></PublicLayout>} />
-      <Route path="/contact" element={<PublicLayout><ContactPage /></PublicLayout>} />
+      <Route path="/careers"  element={<PublicLayout><CareerPage /></PublicLayout>} />
+      <Route path="/contact"  element={<PublicLayout><ContactPage /></PublicLayout>} />
+      <Route path="/news"     element={<PublicLayout><NewsPage /></PublicLayout>} />
+      <Route path="/about"    element={<PublicLayout><AboutPage /></PublicLayout>} />
+      <Route path="/partners" element={<PublicLayout><PartnersPage /></PublicLayout>} />
 
       {/* Protected portal pages — with sidebar */}
       <Route path="/dashboard" element={<ProtectedRoute><Layout><HomePage /></Layout></ProtectedRoute>} />
