@@ -326,15 +326,13 @@ export function CareerPage() {
       </section>
 
       {/* Values */}
-      <section style={{ background: '#0a2540' }} className="w-full py-16 px-6">
+      <section className="bg-white w-full py-16 px-6">
         <div className="max-w-5xl mx-auto">
-          <Typography variant="overline" sx={{ color: '#93c5fd', fontWeight: 700, letterSpacing: 2, display: 'block', mb: 1 }}>
-            Our principles
-          </Typography>
-          <Typography variant="h4" fontWeight={800} sx={{ color: '#fff', mb: 1 }}>
+          <span className="text-xs font-bold tracking-widest text-indigo-500 uppercase">Our principles</span>
+          <Typography variant="h4" fontWeight={800} sx={{ color: '#0f172a', mb: 1, mt: 0.5 }}>
             How we work
           </Typography>
-          <Typography variant="body1" sx={{ color: '#94a3b8', mb: 6, maxWidth: 480 }}>
+          <Typography variant="body1" sx={{ color: '#64748b', mb: 6, maxWidth: 480 }}>
             A few principles that guide everything we do, from code review to customer calls.
           </Typography>
 
@@ -342,8 +340,8 @@ export function CareerPage() {
             {values.map((v) => (
               <div
                 key={v.title}
-                className="flex flex-col rounded-2xl overflow-hidden group"
-                style={{ background: '#112d4e', border: '1px solid rgba(255,255,255,0.07)' }}
+                className="flex flex-col rounded-2xl overflow-hidden group border border-gray-100 hover:shadow-lg transition-shadow"
+                style={{ background: '#f8faff' }}
               >
                 {/* card image */}
                 <div className="w-full overflow-hidden" style={{ height: 220 }}>
@@ -356,10 +354,10 @@ export function CareerPage() {
 
                 {/* card body */}
                 <div className="flex flex-col flex-1 p-6">
-                  <Typography variant="h6" fontWeight={700} sx={{ color: '#f1f5f9', mb: 1.5 }}>
+                  <Typography variant="h6" fontWeight={700} sx={{ color: '#0f172a', mb: 1.5 }}>
                     {v.title}
                   </Typography>
-                  <Typography variant="body2" sx={{ color: '#94a3b8', lineHeight: 1.8 }}>
+                  <Typography variant="body2" sx={{ color: '#64748b', lineHeight: 1.8 }}>
                     {v.body}
                   </Typography>
                 </div>

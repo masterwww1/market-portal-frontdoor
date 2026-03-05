@@ -11,6 +11,9 @@ import {
   ArrowForward as ArrowIcon,
   East as EastIcon,
   Groups as GroupsIcon,
+  AccountCircleOutlined as AccountIcon,
+  Inventory2Outlined as InventoryIcon,
+  HandshakeOutlined as HandshakeIcon,
 } from '@mui/icons-material';
 import { PublicNav, PublicFooter } from '@/components/PublicLayout';
 
@@ -168,62 +171,6 @@ function FeatureCard({ icon, title, desc, accent, bg }: FeatureCardProps) {
   );
 }
 
-// ── Mock product card (used in features section) ──────────────────────────────
-function ProductMockCard() {
-  return (
-    <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-5 w-full max-w-[320px] mx-auto">
-      <div className="flex items-center justify-between mb-4">
-        <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full">CATALOG</span>
-        <span className="text-xs text-gray-400">1,200+ items</span>
-      </div>
-      {[
-        { name: 'Industrial Steel Rods',   vendor: 'Acme Industries',    price: '$480/ton',  tag: 'In Stock' },
-        { name: 'Aluminum Sheet 6061-T6',  vendor: 'MetalMax Corp',      price: '$1,240/lot', tag: 'Bulk' },
-        { name: 'Carbon Fiber Composite',  vendor: 'TechMat Solutions',  price: '$3,600/kg',  tag: 'Express' },
-      ].map(({ name, vendor, price, tag }) => (
-        <div key={name} className="flex items-center gap-3 py-2.5 border-b border-gray-50 last:border-0">
-          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-indigo-100 to-teal-100 flex-shrink-0" />
-          <div className="flex-1 min-w-0">
-            <p className="text-xs font-semibold text-gray-900 truncate">{name}</p>
-            <p className="text-xs text-gray-400">{vendor}</p>
-          </div>
-          <div className="text-right flex-shrink-0">
-            <p className="text-xs font-bold text-gray-900">{price}</p>
-            <span className="text-[10px] text-teal-600 font-semibold">{tag}</span>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function VendorMockCard() {
-  return (
-    <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-5 w-full max-w-[320px] mx-auto">
-      <div className="flex items-center justify-between mb-4">
-        <span className="text-xs font-bold text-purple-600 bg-purple-50 px-2.5 py-1 rounded-full">VENDOR PORTAL</span>
-        <span className="text-xs text-emerald-600 font-semibold">Active</span>
-      </div>
-      <div className="grid grid-cols-2 gap-2 mb-4">
-        {[
-          { label: 'Total Products', value: '34' },
-          { label: 'Active Orders',  value: '12' },
-          { label: 'Revenue MTD',    value: '$28K' },
-          { label: 'Enquiries',      value: '7' },
-        ].map(({ label, value }) => (
-          <div key={label} className="bg-gray-50 rounded-xl p-3">
-            <p className="text-base font-bold text-gray-900">{value}</p>
-            <p className="text-xs text-gray-400">{label}</p>
-          </div>
-        ))}
-      </div>
-      <div className="bg-indigo-50 rounded-xl p-3 text-center">
-        <p className="text-xs font-semibold text-indigo-700">+ 3 new buyer inquiries today</p>
-      </div>
-    </div>
-  );
-}
-
 // ── Main Landing Page ─────────────────────────────────────────────────────────
 export function LandingPage() {
   return (
@@ -232,6 +179,15 @@ export function LandingPage() {
 
       {/* ── Hero Section ──────────────────────────────────────────────── */}
       <section className="hero-bg min-h-screen flex items-center relative overflow-hidden pt-16">
+        {/* Background market image at low opacity for depth */}
+        <img
+          src="/landing-hero-market.png"
+          alt=""
+          aria-hidden
+          className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+          style={{ opacity: 0.13, mixBlendMode: 'luminosity' }}
+        />
+
         {/* Animated orbs */}
         <div
           className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full pointer-events-none"
@@ -375,8 +331,24 @@ export function LandingPage() {
               </RouterLink>
             </div>
 
-            <div>
-              <VendorMockCard />
+            {/* Warehouse image panel */}
+            <div className="relative">
+              <div className="rounded-3xl overflow-hidden shadow-2xl shadow-purple-100/60">
+                <img
+                  src="/landing-vendor-ops.png"
+                  alt="B2B warehouse and supply chain operations"
+                  className="w-full h-80 object-cover"
+                />
+              </div>
+              {/* Floating stat badges */}
+              <div className="absolute -bottom-5 -left-5 bg-white rounded-2xl shadow-xl px-5 py-3.5 border border-gray-100">
+                <p className="text-xl font-black text-purple-600">8,000+</p>
+                <p className="text-xs text-gray-500 font-medium">Verified Vendors</p>
+              </div>
+              <div className="absolute -top-5 -right-5 bg-white rounded-2xl shadow-xl px-5 py-3.5 border border-gray-100">
+                <p className="text-xl font-black text-emerald-600">$2.4M+</p>
+                <p className="text-xs text-gray-500 font-medium">Daily Trade Volume</p>
+              </div>
             </div>
           </div>
         </div>
@@ -386,9 +358,24 @@ export function LandingPage() {
       <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
-            {/* Card first on desktop */}
-            <div className="order-2 lg:order-1">
-              <ProductMockCard />
+            {/* Trade network image first on desktop */}
+            <div className="order-2 lg:order-1 relative">
+              <div className="rounded-3xl overflow-hidden shadow-2xl shadow-teal-100/60">
+                <img
+                  src="/landing-trade-data.png"
+                  alt="Global B2B trade network visualization"
+                  className="w-full h-80 object-cover"
+                />
+              </div>
+              {/* Floating stat badges */}
+              <div className="absolute -bottom-5 -right-5 bg-white rounded-2xl shadow-xl px-5 py-3.5 border border-gray-100">
+                <p className="text-xl font-black text-teal-600">68</p>
+                <p className="text-xs text-gray-500 font-medium">Countries Connected</p>
+              </div>
+              <div className="absolute -top-5 -left-5 bg-white rounded-2xl shadow-xl px-5 py-3.5 border border-gray-100">
+                <p className="text-xl font-black text-indigo-600">40K+</p>
+                <p className="text-xs text-gray-500 font-medium">Active Buyers</p>
+              </div>
             </div>
 
             <div className="order-1 lg:order-2">
@@ -512,31 +499,33 @@ export function LandingPage() {
             {[
               {
                 n: 1,
-                icon: '🏢',
+                icon: <AccountIcon sx={{ fontSize: 26 }} />,
                 title: 'Create your account',
                 desc: 'Register as a vendor to list products, or as a buyer to source them. Verification takes under an hour.',
               },
               {
                 n: 2,
-                icon: '📦',
+                icon: <InventoryIcon sx={{ fontSize: 26 }} />,
                 title: 'Build your profile',
                 desc: 'Vendors add their catalog. Buyers set product preferences and categories they source from.',
               },
               {
                 n: 3,
-                icon: '🤝',
+                icon: <HandshakeIcon sx={{ fontSize: 26 }} />,
                 title: 'Start trading',
                 desc: 'Connect with partners, submit inquiries, manage orders, and grow your B2B revenue.',
               },
             ].map(({ n, icon, title, desc }) => (
               <div key={n} className="flex flex-col items-center text-center px-8 py-4 relative z-10">
                 <div
-                  className="w-14 h-14 rounded-full flex items-center justify-center text-white font-black text-xl shadow-lg mb-5"
+                  className="w-16 h-16 rounded-2xl flex items-center justify-center text-white shadow-lg mb-5"
                   style={{ background: 'linear-gradient(135deg, #635bff 0%, #00c9a7 100%)' }}
                 >
+                  {icon}
+                </div>
+                <div className="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 text-xs font-black flex items-center justify-center mb-3">
                   {n}
                 </div>
-                <div className="text-3xl mb-3">{icon}</div>
                 <h3 className="text-base font-bold text-gray-900 mb-2">{title}</h3>
                 <p className="text-sm text-gray-500 leading-relaxed">{desc}</p>
               </div>

@@ -56,9 +56,9 @@ body {
 
 /* Hero gradient background */
 .hero-bg {
-  background: radial-gradient(ellipse at 20% 50%, rgba(99,91,255,0.15) 0%, transparent 60%),
-              radial-gradient(ellipse at 80% 20%, rgba(0,201,167,0.10) 0%, transparent 50%),
-              linear-gradient(160deg, #0a2540 0%, #0d1f35 40%, #0f1729 100%);
+  background: radial-gradient(ellipse at 20% 50%, rgba(99,91,255,0.18) 0%, transparent 60%),
+              radial-gradient(ellipse at 80% 20%, rgba(0,201,167,0.12) 0%, transparent 50%),
+              linear-gradient(160deg, #112240 0%, #1a2f4b 40%, #1e3a5f 100%);
 }
 
 /* Glass card */

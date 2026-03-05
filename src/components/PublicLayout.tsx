@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, ReactNode } from 'react';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
-import { ArrowForward as ArrowIcon, East as EastIcon } from '@mui/icons-material';
+import { ArrowForward as ArrowIcon, East as EastIcon, Menu as MenuIcon, Close as CloseIcon } from '@mui/icons-material';
 import { useAuth } from '@/core/contexts/AuthContext';
 import { determineRole, buildPortalUrl } from '@/utils/subdomain';
 
@@ -8,17 +8,29 @@ interface PublicLayoutProps {
   children: ReactNode;
 }
 
+const NAV_LINKS = [
+  { to: '/about', label: 'About' },
+  { to: '/news', label: 'News' },
+  { to: '/partners', label: 'Partners' },
+  { to: '/careers', label: 'Careers' },
+  { to: '/contact', label: 'Contact' },
+];
+
 function PublicNav() {
   const { isAuthenticated, user } = useAuth();
   const location = useLocation();
   const [scrolled, setScrolled] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
-    // Reset on route change
     setScrolled(window.scrollY > 60);
     const handler = () => setScrolled(window.scrollY > 60);
     window.addEventListener('scroll', handler, { passive: true });
     return () => window.removeEventListener('scroll', handler);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    setMobileOpen(false);
   }, [location.pathname]);
 
   const toDashboard = useCallback(() => {
@@ -27,54 +39,66 @@ function PublicNav() {
     }
   }, [user]);
 
+  const linkColor = scrolled
+    ? (to: string) => location.pathname === to ? '#4f46e5' : '#374151'
+    : (to: string) => location.pathname === to ? 'white' : 'rgba(255,255,255,0.75)';
+
   return (
     <header
       className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
       style={{
-        background: scrolled ? 'rgba(10,37,64,0.97)' : 'transparent',
-        backdropFilter: scrolled ? 'blur(12px)' : 'none',
-        WebkitBackdropFilter: scrolled ? 'blur(12px)' : 'none',
-        boxShadow: scrolled ? '0 1px 0 rgba(255,255,255,0.08)' : 'none',
+        background: scrolled
+          ? 'rgba(255,255,255,0.97)'
+          : mobileOpen
+          ? 'rgba(17,34,64,0.97)'
+          : 'transparent',
+        backdropFilter: scrolled || mobileOpen ? 'blur(16px)' : 'none',
+        WebkitBackdropFilter: scrolled || mobileOpen ? 'blur(16px)' : 'none',
+        boxShadow: scrolled ? '0 1px 0 rgba(0,0,0,0.08)' : 'none',
       }}
     >
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         <RouterLink
           to="/"
-          className="text-white font-black text-xl tracking-tight no-underline"
-          style={{ textDecoration: 'none' }}
+          className="font-black text-xl tracking-tight no-underline transition-colors"
+          style={{ color: scrolled ? '#0f172a' : 'white', textDecoration: 'none' }}
         >
           B2Bmarket
         </RouterLink>
 
+        {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-6">
-          <RouterLink
-            to="/careers"
-            className="text-sm font-medium transition-colors no-underline"
-            style={{
-              color: location.pathname === '/careers' ? 'white' : 'rgba(255,255,255,0.7)',
-              textDecoration: 'none',
-            }}
-          >
-            Careers
-          </RouterLink>
-          <RouterLink
-            to="/contact"
-            className="text-sm font-medium transition-colors no-underline"
-            style={{
-              color: location.pathname === '/contact' ? 'white' : 'rgba(255,255,255,0.7)',
-              textDecoration: 'none',
-            }}
-          >
-            Contact
-          </RouterLink>
+          {NAV_LINKS.map(({ to, label }) => (
+            <RouterLink
+              key={to}
+              to={to}
+              className="text-sm font-medium transition-colors no-underline"
+              style={{ color: linkColor(to), textDecoration: 'none' }}
+            >
+              {label}
+            </RouterLink>
+          ))}
         </nav>
 
-        <div className="flex items-center gap-3">
+        {/* Mobile hamburger */}
+        <button
+          className="md:hidden p-1 transition-colors"
+          style={{ color: scrolled ? '#0f172a' : 'white' }}
+          onClick={() => setMobileOpen((v) => !v)}
+          aria-label="Toggle menu"
+        >
+          {mobileOpen ? <CloseIcon /> : <MenuIcon />}
+        </button>
+
+        <div className="hidden md:flex items-center gap-3">
           {isAuthenticated ? (
             <button
               onClick={toDashboard}
-              className="flex items-center gap-2 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
-              style={{ background: 'rgba(255,255,255,0.12)' }}
+              className="flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
+              style={{
+                background: scrolled ? '#f1f5f9' : 'rgba(255,255,255,0.12)',
+                color: scrolled ? '#0f172a' : 'white',
+              }}
             >
               Go to Dashboard
               <EastIcon sx={{ fontSize: 16 }} />
@@ -82,7 +106,7 @@ function PublicNav() {
           ) : (
             <RouterLink
               to="/login"
-              className="flex items-center gap-2 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors no-underline"
+              className="flex items-center gap-2 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-all no-underline hover:opacity-90"
               style={{
                 background: 'linear-gradient(135deg, #635bff 0%, #4f46e5 100%)',
                 textDecoration: 'none',
@@ -94,13 +118,49 @@ function PublicNav() {
           )}
         </div>
       </div>
+
+      {/* Mobile menu */}
+      {mobileOpen && (
+        <div className="md:hidden border-t border-white/10 px-6 py-4 flex flex-col gap-3">
+          {NAV_LINKS.map(({ to, label }) => (
+            <RouterLink
+              key={to}
+              to={to}
+              className="text-sm font-medium py-2 no-underline border-b border-white/10 last:border-0"
+              style={{
+                color: location.pathname === to ? 'white' : 'rgba(255,255,255,0.7)',
+                textDecoration: 'none',
+              }}
+            >
+              {label}
+            </RouterLink>
+          ))}
+          {isAuthenticated ? (
+            <button
+              onClick={toDashboard}
+              className="mt-2 flex items-center gap-2 text-white text-sm font-semibold px-4 py-3 rounded-lg"
+              style={{ background: 'rgba(255,255,255,0.12)' }}
+            >
+              Go to Dashboard <EastIcon sx={{ fontSize: 16 }} />
+            </button>
+          ) : (
+            <RouterLink
+              to="/login"
+              className="mt-2 flex items-center justify-center gap-2 text-white text-sm font-semibold px-4 py-3 rounded-lg no-underline"
+              style={{ background: 'linear-gradient(135deg, #635bff 0%, #4f46e5 100%)', textDecoration: 'none' }}
+            >
+              Sign In <ArrowIcon sx={{ fontSize: 16 }} />
+            </RouterLink>
+          )}
+        </div>
+      )}
     </header>
   );
 }
 
 function PublicFooter() {
   return (
-    <footer style={{ backgroundColor: '#0a2540' }}>
+    <footer style={{ backgroundColor: '#0f172a' }}>
       <div className="max-w-7xl mx-auto px-6 py-14">
         <div className="grid md:grid-cols-4 gap-10 mb-10">
           <div className="md:col-span-2">
@@ -115,6 +175,9 @@ function PublicFooter() {
             <p className="text-white/60 text-xs font-bold uppercase tracking-widest mb-4">Company</p>
             <div className="space-y-2.5">
               {[
+                { to: '/about', label: 'About Us' },
+                { to: '/news', label: 'News & Insights' },
+                { to: '/partners', label: 'Partners' },
                 { to: '/careers', label: 'Careers' },
                 { to: '/contact', label: 'Contact' },
               ].map(({ to, label }) => (
