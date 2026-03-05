@@ -119,24 +119,24 @@ const openRoles: Job[] = [
 
 const values = [
   {
-    icon: '🚀',
-    title: 'Move fast, stay precise',
-    body: 'We ship frequently but never cut corners on correctness. Speed and quality are not opposites.',
+    img: '/b2b-card-dev-discussion.png',
+    title: 'Precision at Every Step',
+    body: 'We move quickly without sacrificing quality. Our engineering culture is rooted in rigorous code review, continuous delivery, and a shared commitment to correctness. Every feature we ship is deliberate — because reliability is the foundation our customers build their businesses on.',
   },
   {
-    icon: '🤝',
-    title: 'Vendors & buyers first',
-    body: 'Every decision starts with the question: does this make trade better for the people using our platform?',
+    img: '/b2b-card-vendor-onboarding.png',
+    title: 'Partnerships That Last',
+    body: 'Every product decision begins with a single question: does this create real value for the vendors and buyers on our platform? We work hand-in-hand with our partners from day one, treating their growth as our own and building relationships that extend well beyond the initial onboarding.',
   },
   {
-    icon: '🌍',
-    title: 'Distributed by default',
-    body: 'Our team spans continents. We write clearly, communicate asynchronously, and trust each other.',
+    img: '/b2b-card-remote-team.png',
+    title: 'Global Team, One Mission',
+    body: 'Our team operates across time zones without losing cohesion. We communicate with clarity, document decisions thoroughly, and trust each other to deliver. Being distributed is not a limitation — it is how we access world-class talent and build a genuinely inclusive workplace.',
   },
   {
-    icon: '📈',
-    title: 'Grow together',
-    body: 'We invest in mentorship, learning budgets, and career tracks so everyone levels up alongside the company.',
+    img: '/b2b-card-grow-together.png',
+    title: 'Invest in Each Other',
+    body: 'Growth at B2Bmarket is never a solo endeavour. We pair senior engineers with emerging talent, fund continuous learning through personal development budgets, and maintain transparent career tracks so every team member knows exactly where they stand and where they are headed.',
   },
 ];
 
@@ -278,28 +278,46 @@ export function CareerPage() {
       </section>
 
       {/* Values */}
-      <section className="max-w-5xl mx-auto px-6 py-16">
-        <Typography variant="h5" fontWeight={700} className="text-gray-900 mb-2">
-          How we work
-        </Typography>
-        <Typography variant="body2" color="text.secondary" className="mb-8">
-          A few principles that guide our day-to-day.
-        </Typography>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {values.map((v) => (
-            <div
-              key={v.title}
-              className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm hover:shadow-md transition-shadow"
-            >
-              <div className="text-3xl mb-3">{v.icon}</div>
-              <Typography variant="subtitle1" fontWeight={700} gutterBottom>
-                {v.title}
-              </Typography>
-              <Typography variant="body2" color="text.secondary" className="leading-relaxed">
-                {v.body}
-              </Typography>
-            </div>
-          ))}
+      <section style={{ background: '#0a2540' }} className="w-full py-16 px-6">
+        <div className="max-w-5xl mx-auto">
+          <Typography variant="overline" sx={{ color: '#93c5fd', fontWeight: 700, letterSpacing: 2, display: 'block', mb: 1 }}>
+            Our principles
+          </Typography>
+          <Typography variant="h4" fontWeight={800} sx={{ color: '#fff', mb: 1 }}>
+            How we work
+          </Typography>
+          <Typography variant="body1" sx={{ color: '#94a3b8', mb: 6, maxWidth: 480 }}>
+            A few principles that guide everything we do, from code review to customer calls.
+          </Typography>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+            {values.map((v) => (
+              <div
+                key={v.title}
+                className="flex flex-col rounded-2xl overflow-hidden group"
+                style={{ background: '#112d4e', border: '1px solid rgba(255,255,255,0.07)' }}
+              >
+                {/* card image */}
+                <div className="w-full overflow-hidden" style={{ height: 220 }}>
+                  <img
+                    src={v.img}
+                    alt={v.title}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                </div>
+
+                {/* card body */}
+                <div className="flex flex-col flex-1 p-6">
+                  <Typography variant="h6" fontWeight={700} sx={{ color: '#f1f5f9', mb: 1.5 }}>
+                    {v.title}
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: '#94a3b8', lineHeight: 1.8 }}>
+                    {v.body}
+                  </Typography>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
