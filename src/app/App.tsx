@@ -6,6 +6,8 @@ import { HealthPage } from '@/pages/HealthPage';
 import { VendorsPage } from '@/pages/VendorsPage';
 import { ProductsPage } from '@/pages/ProductsPage';
 import { LoginPage } from '@/pages/LoginPage';
+import { CareerPage } from '@/pages/CareerPage';
+import { ContactPage } from '@/pages/ContactPage';
 import '@/app/style.css';
 
 function App() {
@@ -13,6 +15,8 @@ function App() {
     <Layout>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/careers" element={<CareerPage />} />
+        <Route path="/contact" element={<ContactPage />} />
         <Route
           path="/"
           element={

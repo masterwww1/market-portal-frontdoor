@@ -22,6 +22,11 @@ const navItems = [
   { to: '/health', label: 'Health' },
 ];
 
+const publicNavItems = [
+  { to: '/careers', label: 'Careers' },
+  { to: '/contact', label: 'Contact' },
+];
+
 export function Layout({ children }: LayoutProps) {
   const { user, logout, isAuthenticated } = useAuth();
   const location = useLocation();
@@ -54,13 +59,13 @@ export function Layout({ children }: LayoutProps) {
       </AppBar>
 
       <div className="flex flex-1 min-h-0 w-full">
-        {isAuthenticated && (
-          <aside
-            className="flex-shrink-0 border-r border-gray-200 bg-gray-50 flex flex-col"
-            style={{ width: SIDEBAR_WIDTH }}
-          >
-            <nav className="p-4 flex flex-col gap-1">
-              {navItems.map(({ to, label }) => {
+        <aside
+          className="flex-shrink-0 border-r border-gray-200 bg-gray-50 flex flex-col"
+          style={{ width: SIDEBAR_WIDTH }}
+        >
+          <nav className="p-4 flex flex-col gap-1">
+            {isAuthenticated &&
+              navItems.map(({ to, label }) => {
                 const isActive = location.pathname === to || (to !== '/' && location.pathname.startsWith(to));
                 return (
                   <RouterLink
@@ -76,9 +81,29 @@ export function Layout({ children }: LayoutProps) {
                   </RouterLink>
                 );
               })}
-            </nav>
-          </aside>
-        )}
+
+            {isAuthenticated && (
+              <div className="my-2 border-t border-gray-200" />
+            )}
+
+            {publicNavItems.map(({ to, label }) => {
+              const isActive = location.pathname === to;
+              return (
+                <RouterLink
+                  key={to}
+                  to={to}
+                  className={`px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+                    isActive
+                      ? 'bg-blue-100 text-blue-800'
+                      : 'text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  {label}
+                </RouterLink>
+              );
+            })}
+          </nav>
+        </aside>
 
         <main className="flex-1 min-w-0 overflow-auto">
           {children}
