@@ -1,6 +1,8 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
+import { PublicLayout } from '@/components/PublicLayout';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { LandingPage } from '@/pages/LandingPage';
 import { HomePage } from '@/pages/HomePage';
 import { HealthPage } from '@/pages/HealthPage';
 import { VendorsPage } from '@/pages/VendorsPage';
@@ -8,49 +10,33 @@ import { ProductsPage } from '@/pages/ProductsPage';
 import { LoginPage } from '@/pages/LoginPage';
 import { CareerPage } from '@/pages/CareerPage';
 import { ContactPage } from '@/pages/ContactPage';
+import { getSubdomain } from '@/utils/subdomain';
 import '@/app/style.css';
 
 function App() {
+  const onPortalSubdomain = Boolean(getSubdomain(window.location.hostname));
+
   return (
-    <Layout>
-      <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/careers" element={<CareerPage />} />
-        <Route path="/contact" element={<ContactPage />} />
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <HomePage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/vendors"
-          element={
-            <ProtectedRoute>
-              <VendorsPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/products"
-          element={
-            <ProtectedRoute>
-              <ProductsPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/health"
-          element={
-            <ProtectedRoute>
-              <HealthPage />
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
-    </Layout>
+    <Routes>
+      {/* Root: landing page on main domain, redirect to dashboard on subdomains */}
+      <Route
+        path="/"
+        element={onPortalSubdomain ? <Navigate to="/dashboard" replace /> : <LandingPage />}
+      />
+
+      {/* Auth — no sidebar layout */}
+      <Route path="/login" element={<LoginPage />} />
+
+      {/* Public pages — landing page style (nav + footer, no sidebar) */}
+      <Route path="/careers" element={<PublicLayout><CareerPage /></PublicLayout>} />
+      <Route path="/contact" element={<PublicLayout><ContactPage /></PublicLayout>} />
+
+      {/* Protected portal pages — with sidebar */}
+      <Route path="/dashboard" element={<ProtectedRoute><Layout><HomePage /></Layout></ProtectedRoute>} />
+      <Route path="/vendors"   element={<ProtectedRoute><Layout><VendorsPage /></Layout></ProtectedRoute>} />
+      <Route path="/products"  element={<ProtectedRoute><Layout><ProductsPage /></Layout></ProtectedRoute>} />
+      <Route path="/health"    element={<ProtectedRoute><Layout><HealthPage /></Layout></ProtectedRoute>} />
+    </Routes>
   );
 }
 
