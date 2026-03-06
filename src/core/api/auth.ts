@@ -1,12 +1,4 @@
-import axios from 'axios';
-
-const AUTH_BASE_URL = import.meta.env.VITE_AUTH_API_URL || '/api/auth';
-
-const authClient = axios.create({
-  baseURL: AUTH_BASE_URL,
-  timeout: 10000,
-  headers: { 'Content-Type': 'application/json' },
-});
+import client from './client';
 
 export interface LoginRequest {
   email: string;
@@ -46,19 +38,19 @@ export interface VerifyTokenResponse {
 }
 
 export const login = async (credentials: LoginRequest) => {
-  const response = await authClient.post<LoginResponse>('/login', credentials);
+  const response = await client.post<LoginResponse>('/auth/login', credentials);
   return response.data;
 };
 
 export const refreshToken = async (refreshToken: string) => {
-  const response = await authClient.post<RefreshTokenResponse>('/refresh', {
+  const response = await client.post<RefreshTokenResponse>('/auth/refresh', {
     refresh_token: refreshToken,
   });
   return response.data;
 };
 
 export const verifyToken = async (token: string) => {
-  const response = await authClient.post<VerifyTokenResponse>('/verify', {
+  const response = await client.post<VerifyTokenResponse>('/auth/verify', {
     token,
   });
   return response.data;
