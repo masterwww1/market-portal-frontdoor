@@ -5,6 +5,11 @@ export interface LoginRequest {
   password: string;
 }
 
+export interface RegisterRequest {
+  email: string;
+  password: string;
+}
+
 export interface LoginResponse {
   access_token: string;
   refresh_token: string;
@@ -53,5 +58,10 @@ export const verifyToken = async (token: string) => {
   const response = await client.post<VerifyTokenResponse>('/auth/verify', {
     token,
   });
+  return response.data;
+};
+
+export const register = async (payload: RegisterRequest) => {
+  const response = await client.post<LoginResponse>('/auth/register', payload);
   return response.data;
 };

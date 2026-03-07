@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 import { useNavigate } from 'react-router-dom';
 import {
   login as loginApi,
+  register as registerApi,
   refreshToken as refreshTokenApi,
   verifyToken as verifyTokenApi,
   LoginResponse,
@@ -28,6 +29,7 @@ interface AuthContextType {
   loading: boolean;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
+  register: (email: string, password: string) => Promise<void>;
   logout: () => void;
   refreshAccessToken: () => Promise<void>;
 }
@@ -132,35 +134,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const login = async (email: string, password: string) => {
-    const response: LoginResponse = await loginApi({ email, password });
-
-    const loggedInUser: User = {
+  const completeAuth = (response: LoginResponse) => {
+    const authedUser: User = {
       ...response.user,
       role: (response.user as any).role,
     };
 
     localStorage.setItem(ACCESS_TOKEN_KEY, response.access_token);
     localStorage.setItem(REFRESH_TOKEN_KEY, response.refresh_token);
-    localStorage.setItem(USER_KEY, JSON.stringify(loggedInUser));
-    setUser(loggedInUser);
+    localStorage.setItem(USER_KEY, JSON.stringify(authedUser));
+    setUser(authedUser);
 
-    const userRole = determineRole(loggedInUser);
+    const userRole = determineRole(authedUser);
     const currentSubdomain = getSubdomain(window.location.hostname);
 
     if (currentSubdomain === userRole) {
-      // Already on the right subdomain — just navigate
       navigate('/dashboard');
     } else {
-      // Cross to the role subdomain, carrying tokens via URL handoff
       const handoff = encodeHandoff(
         response.access_token,
         response.refresh_token,
-        loggedInUser,
+        authedUser,
       );
       const portalUrl = buildPortalUrl(userRole, `/dashboard?${TOKEN_HANDOFF_PARAM}=${handoff}`);
       window.location.href = portalUrl;
     }
+  };
+
+  const login = async (email: string, password: string) => {
+    const response = await loginApi({ email, password });
+    completeAuth(response);
+  };
+
+  const register = async (email: string, password: string) => {
+    const response = await registerApi({ email, password });
+    completeAuth(response);
   };
 
   const logout = () => {
@@ -180,6 +188,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         loading,
         isAuthenticated: !!user,
         login,
+        register,
         logout,
         refreshAccessToken,
       }}

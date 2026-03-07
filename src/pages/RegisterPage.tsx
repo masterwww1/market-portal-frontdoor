@@ -1,5 +1,5 @@
 import { useState, FormEvent } from 'react';
-import { useNavigate, Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 import {
   Box,
   Button,
@@ -13,30 +13,42 @@ import {
 import { useAuth } from '@/core/contexts/AuthContext';
 import logo from '@/asset/logo.png';
 
-export function LoginPage() {
+export function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const { login, isAuthenticated } = useAuth();
-  const navigate = useNavigate();
+  const { register, isAuthenticated } = useAuth();
 
-  // Redirect if already authenticated
   if (isAuthenticated) {
-    navigate('/dashboard');
+    window.location.href = '/dashboard';
     return null;
   }
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError(null);
-    setLoading(true);
 
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters.');
+      return;
+    }
+
+    setLoading(true);
     try {
-      await login(email, password);
-      // Navigation handled by AuthContext
+      await register(email, password);
     } catch (err: any) {
-      setError(err.message || 'Login failed. Please check your credentials.');
+      const detail = err?.response?.data?.detail;
+      setError(
+        typeof detail === 'string'
+          ? detail
+          : err.message || 'Registration failed. Please try again.',
+      );
     } finally {
       setLoading(false);
     }
@@ -54,32 +66,21 @@ export function LoginPage() {
         py: 3,
       }}
     >
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          width: '100%',
-        }}
-      >
+      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
         <Paper elevation={3} sx={{ p: 4, width: '100%' }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 2 }}>
             <Box
               component="img"
               src={logo}
               alt="B2Bmarket Logo"
-              sx={{
-                height: 80,
-                width: 'auto',
-                mb: 2,
-              }}
+              sx={{ height: 80, width: 'auto', mb: 2 }}
             />
             <Typography component="h1" variant="h5" align="center" gutterBottom>
               B2Bmarket
             </Typography>
           </Box>
           <Typography component="h2" variant="h6" align="center" color="text.secondary" sx={{ mb: 3 }}>
-            Sign in to your account
+            Create your account
           </Typography>
 
           {error && (
@@ -110,9 +111,22 @@ export function LoginPage() {
               label="Password"
               type="password"
               id="password"
-              autoComplete="current-password"
+              autoComplete="new-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              disabled={loading}
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              name="confirmPassword"
+              label="Confirm Password"
+              type="password"
+              id="confirmPassword"
+              autoComplete="new-password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
               disabled={loading}
             />
             <Button
@@ -120,20 +134,15 @@ export function LoginPage() {
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
-              disabled={loading || !email || !password}
+              disabled={loading || !email || !password || !confirmPassword}
             >
-              {loading ? 'Signing in...' : 'Sign In'}
+              {loading ? 'Creating account...' : 'Create Account'}
             </Button>
-            <Box sx={{ textAlign: 'center', mt: 2 }}>
-              <Link href="#" variant="body2" onClick={(e) => e.preventDefault()}>
-                Forgot password?
-              </Link>
-            </Box>
             <Box sx={{ textAlign: 'center', mt: 1 }}>
               <Typography variant="body2" color="text.secondary">
-                Don't have an account?{' '}
-                <Link component={RouterLink} to="/register" variant="body2">
-                  Register
+                Already have an account?{' '}
+                <Link component={RouterLink} to="/login" variant="body2">
+                  Sign in
                 </Link>
               </Typography>
             </Box>

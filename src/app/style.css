@@ -10,6 +10,15 @@
 body {
   margin: 0;
   font-family: 'DM Sans', sans-serif;
+  /* clip prevents horizontal scroll without breaking window scroll events */
+  overflow-x: clip;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+  width: 100%;
 }
 
 /* ── Landing page animations ────────────────────────────────── */
