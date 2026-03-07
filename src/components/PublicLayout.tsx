@@ -21,10 +21,13 @@ function PublicNav() {
   const location = useLocation();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const useSolidHeader = scrolled || mobileOpen;
 
   useEffect(() => {
-    setScrolled(window.scrollY > 60);
-    const handler = () => setScrolled(window.scrollY > 60);
+    const getScrollY = () =>
+      window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
+    setScrolled(getScrollY() > 60);
+    const handler = () => setScrolled(getScrollY() > 60);
     window.addEventListener('scroll', handler, { passive: true });
     return () => window.removeEventListener('scroll', handler);
   }, [location.pathname]);
@@ -39,29 +42,27 @@ function PublicNav() {
     }
   }, [user]);
 
-  const linkColor = scrolled
-    ? (to: string) => location.pathname === to ? '#4f46e5' : '#374151'
+  // Top: transparent + white text. Scrolled: solid white bg + black text
+  const brandColor = useSolidHeader ? '#000000' : '#ffffff';
+  const linkColor = useSolidHeader
+    ? (to: string) => location.pathname === to ? '#000000' : '#374151'
     : (to: string) => location.pathname === to ? 'white' : 'rgba(255,255,255,0.75)';
 
   return (
     <header
       className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
       style={{
-        background: scrolled
-          ? 'rgba(255,255,255,0.97)'
-          : mobileOpen
-          ? 'rgba(17,34,64,0.97)'
-          : 'transparent',
-        backdropFilter: scrolled || mobileOpen ? 'blur(16px)' : 'none',
-        WebkitBackdropFilter: scrolled || mobileOpen ? 'blur(16px)' : 'none',
-        boxShadow: scrolled ? '0 1px 0 rgba(0,0,0,0.08)' : 'none',
+        background: useSolidHeader ? '#ffffff' : 'transparent',
+        backdropFilter: useSolidHeader ? 'none' : 'blur(16px)',
+        WebkitBackdropFilter: useSolidHeader ? 'none' : 'blur(16px)',
+        boxShadow: useSolidHeader ? '0 1px 0 rgba(0,0,0,0.08)' : '0 1px 0 rgba(255,255,255,0.06)',
       }}
     >
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         <RouterLink
           to="/"
           className="font-black text-xl tracking-tight no-underline transition-colors"
-          style={{ color: scrolled ? '#0f172a' : 'white', textDecoration: 'none' }}
+          style={{ color: brandColor, textDecoration: 'none' }}
         >
           B2Bmarket
         </RouterLink>
@@ -83,7 +84,7 @@ function PublicNav() {
         {/* Mobile hamburger */}
         <button
           className="md:hidden p-1 transition-colors"
-          style={{ color: scrolled ? '#0f172a' : 'white' }}
+          style={{ color: brandColor }}
           onClick={() => setMobileOpen((v) => !v)}
           aria-label="Toggle menu"
         >
@@ -96,8 +97,8 @@ function PublicNav() {
               onClick={toDashboard}
               className="flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
               style={{
-                background: scrolled ? '#f1f5f9' : 'rgba(255,255,255,0.12)',
-                color: scrolled ? '#0f172a' : 'white',
+                background: useSolidHeader ? '#f1f5f9' : 'rgba(255,255,255,0.12)',
+                color: useSolidHeader ? '#000000' : 'white',
               }}
             >
               Go to Dashboard
@@ -106,8 +107,9 @@ function PublicNav() {
           ) : (
             <RouterLink
               to="/login"
-              className="flex items-center gap-2 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-all no-underline hover:opacity-90"
+              className="flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-lg transition-all no-underline hover:opacity-90"
               style={{
+                color: 'white',
                 background: 'linear-gradient(135deg, #635bff 0%, #4f46e5 100%)',
                 textDecoration: 'none',
               }}
@@ -121,14 +123,23 @@ function PublicNav() {
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-white/10 px-6 py-4 flex flex-col gap-3">
+        <div
+          className="md:hidden px-6 py-4 flex flex-col gap-3"
+          style={{
+            background: useSolidHeader ? '#ffffff' : 'rgba(17,34,64,0.97)',
+            borderTop: useSolidHeader ? '1px solid rgba(0,0,0,0.08)' : '1px solid rgba(255,255,255,0.10)',
+          }}
+        >
           {NAV_LINKS.map(({ to, label }) => (
             <RouterLink
               key={to}
               to={to}
-              className="text-sm font-medium py-2 no-underline border-b border-white/10 last:border-0"
+              className="text-sm font-medium py-2 no-underline last:border-0"
               style={{
-                color: location.pathname === to ? 'white' : 'rgba(255,255,255,0.7)',
+                color: useSolidHeader
+                  ? (location.pathname === to ? '#000000' : '#374151')
+                  : (location.pathname === to ? 'white' : 'rgba(255,255,255,0.7)'),
+                borderBottom: useSolidHeader ? '1px solid rgba(0,0,0,0.08)' : '1px solid rgba(255,255,255,0.10)',
                 textDecoration: 'none',
               }}
             >
@@ -138,8 +149,11 @@ function PublicNav() {
           {isAuthenticated ? (
             <button
               onClick={toDashboard}
-              className="mt-2 flex items-center gap-2 text-white text-sm font-semibold px-4 py-3 rounded-lg"
-              style={{ background: 'rgba(255,255,255,0.12)' }}
+              className="mt-2 flex items-center gap-2 text-sm font-semibold px-4 py-3 rounded-lg"
+              style={{
+                color: useSolidHeader ? '#000000' : 'white',
+                background: useSolidHeader ? '#f1f5f9' : 'rgba(255,255,255,0.12)',
+              }}
             >
               Go to Dashboard <EastIcon sx={{ fontSize: 16 }} />
             </button>

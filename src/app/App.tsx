@@ -8,6 +8,7 @@ import { HealthPage } from '@/pages/HealthPage';
 import { VendorsPage } from '@/pages/VendorsPage';
 import { ProductsPage } from '@/pages/ProductsPage';
 import { LoginPage } from '@/pages/LoginPage';
+import { RegisterPage } from '@/pages/RegisterPage';
 import { CareerPage } from '@/pages/CareerPage';
 import { ContactPage } from '@/pages/ContactPage';
 import NewsPage from '@/pages/NewsPage';
@@ -29,6 +30,7 @@ function App() {
 
       {/* Auth — no sidebar layout */}
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
 
       {/* Public pages — landing page style (nav + footer, no sidebar) */}
       <Route path="/careers"  element={<PublicLayout><CareerPage /></PublicLayout>} />
